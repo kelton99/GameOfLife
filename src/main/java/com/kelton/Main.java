@@ -9,7 +9,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         MainView view = new MainView();
-        stage.setScene(new Scene(view, 600, 600));
+        stage.setScene(new Scene(view, 1000, 700));
         stage.show();
         view.draw();
     }
