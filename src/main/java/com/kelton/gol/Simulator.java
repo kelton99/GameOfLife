@@ -1,4 +1,4 @@
-package com.kelton;
+package com.kelton.gol;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

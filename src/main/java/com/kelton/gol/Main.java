@@ -1,4 +1,4 @@
-package com.kelton;
+package com.kelton.gol;
 
 import javafx.application.Application;
 import javafx.scene.Scene;

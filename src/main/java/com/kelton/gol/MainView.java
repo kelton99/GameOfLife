@@ -1,5 +1,9 @@
-package com.kelton;
+package com.kelton.gol;
 
+import com.kelton.gol.model.Board;
+import com.kelton.gol.model.BoundedBoard;
+import com.kelton.gol.model.CellState;
+import com.kelton.gol.model.StandardRule;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -20,7 +24,7 @@ public class MainView extends VBox {
 
     //canvas and the table are squared for simplicity
     public final int canvasSize = 600;
-    public final int tableSize = 50;
+    public final int boardSize = 50;
 
     private InfoBar infoBar;
 
@@ -29,11 +33,9 @@ public class MainView extends VBox {
     private Affine affine;
 
     private Simulation simulation;
-    private Simulation initialSimulation;
+    private Board initialBoard;
 
-    private Simulator simulator;
-
-    private int drawMode = Simulation.ALIVE;
+    private CellState drawMode = CellState.ALIVE;
 
     private int applicationState = EDITING;
 
@@ -58,10 +60,8 @@ public class MainView extends VBox {
         this.getChildren().addAll(toolbar, this.canvas, spacer, infoBar);
 
         this.affine = new Affine();
-        this.affine.appendScale(canvasSize / tableSize, canvasSize / tableSize);
-        this.initialSimulation = new Simulation(tableSize, tableSize);
-        this.simulation = Simulation.copy(this.initialSimulation);
-
+        this.affine.appendScale(canvasSize / boardSize, canvasSize / boardSize);
+        this.initialBoard = new BoundedBoard(boardSize, boardSize);
     }
 
     private void handleMoved(MouseEvent mouseEvent) {
@@ -73,9 +73,9 @@ public class MainView extends VBox {
 
     private void onKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.D)
-            this.drawMode = Simulation.ALIVE;
+            this.drawMode = CellState.ALIVE;
         else if (keyEvent.getCode() == KeyCode.E)
-            this.drawMode = Simulation.DEAD;
+            this.drawMode = CellState.DEAD;
     }
 
     private void handleDraw(MouseEvent event) {
@@ -84,7 +84,7 @@ public class MainView extends VBox {
         Point2D simCoord = this.getSimulationCoordinates(event);
         int simX = (int) simCoord.getX();
         int simY = (int) simCoord.getY();
-        this.initialSimulation.setState(simX, simY, drawMode);
+        this.initialBoard.setState(simX, simY, drawMode);
         draw();
     }
 
@@ -107,37 +107,33 @@ public class MainView extends VBox {
         g.fillRect(0, 0, canvasSize, canvasSize);
 
         if(this.applicationState == EDITING){
-            drawSimulation(this.initialSimulation);
+            drawSimulation(this.initialBoard);
         }else{
-            drawSimulation(this.simulation);
+            drawSimulation(this.simulation.getBoard());
         }
 
         g.setStroke(Color.GRAY);
         g.setLineWidth(0.05);
-        for (int x = 0; x < this.simulation.width + 1; x++) {
-            g.strokeLine(x, 0, x, tableSize);
+        for (int x = 0; x <= this.initialBoard.getWidth(); x++) {
+            g.strokeLine(x, 0, x, boardSize);
         }
-        for (int y = 0; y < this.simulation.height + 1; y++) {
-            g.strokeLine(0, y, tableSize, y);
+        for (int y = 0; y <= this.initialBoard.getHeight(); y++) {
+            g.strokeLine(0, y, boardSize, y);
         }
     }
 
-    private void drawSimulation(Simulation simulationToDraw){
+    private void drawSimulation(Board simulationToDraw){
         GraphicsContext g = this.canvas.getGraphicsContext2D();
         g.setFill(Color.BLACK);
-        for (int x = 0; x < simulationToDraw.width; x++) {
-            for (int y = 0; y < simulationToDraw.height; y++) {
-                if (simulationToDraw.getState(x, y) == Simulation.ALIVE)
+        for (int x = 0; x < simulationToDraw.getWidth(); x++) {
+            for (int y = 0; y < simulationToDraw.getHeight(); y++) {
+                if (simulationToDraw.getState(x, y) == CellState.ALIVE)
                     g.fillRect(x, y, 1, 1);
             }
         }
     }
 
-    public Simulation getSimulation() {
-        return this.simulation;
-    }
-
-    public void setDrawMode(int mode) {
+    public void setDrawMode(CellState mode) {
         this.drawMode = mode;
         this.infoBar.setDrawMode(mode);
     }
@@ -146,13 +142,18 @@ public class MainView extends VBox {
         if(applicationState == this.applicationState)  return;
 
         if(applicationState == SIMULATING) {
-            this.simulation = Simulation.copy(this.initialSimulation);
-            this.simulator = new Simulator(this, this.simulation);
+            this.simulation = new Simulation(this.initialBoard, new StandardRule());
+
         }
         this.applicationState = applicationState;
     }
 
-    public Simulator getSimulator() {
-        return simulator;
+    public int getApplicationState() {
+        return applicationState;
+    }
+
+    public Simulation getSimulation() {
+        return simulation;
     }
 }
+
