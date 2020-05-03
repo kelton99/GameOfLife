@@ -1,11 +1,8 @@
-com/kelton/gol/Simulator.class
 com/kelton/gol/Toolbar.class
 com/kelton/gol/model/SimulationRule.class
 com/kelton/gol/model/CellState.class
-com/kelton/gol/Simulation.class
+com/kelton/gol/viewmodel/ApplicationViewModel.class
 com/kelton/gol/model/StandardRule.class
-com/kelton/gol/Main.class
-com/kelton/gol/model/BoundedBoard.class
-com/kelton/gol/MainView.class
-com/kelton/gol/InfoBar.class
+com/kelton/gol/viewmodel/SimpleChangeListener.class
+com/kelton/gol/viewmodel/ApplicationState.class
 com/kelton/gol/model/Board.class

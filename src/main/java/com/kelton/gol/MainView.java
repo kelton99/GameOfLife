@@ -1,9 +1,11 @@
 package com.kelton.gol;
 
 import com.kelton.gol.model.Board;
-import com.kelton.gol.model.BoundedBoard;
 import com.kelton.gol.model.CellState;
 import com.kelton.gol.model.StandardRule;
+import com.kelton.gol.viewmodel.ApplicationState;
+import com.kelton.gol.viewmodel.ApplicationViewModel;
+import com.kelton.gol.viewmodel.BoardViewModel;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -19,12 +21,10 @@ import javafx.scene.transform.NonInvertibleTransformException;
 
 public class MainView extends VBox {
 
-    public static final int EDITING = 0;
-    public static final int SIMULATING = 1;
-
     //canvas and the table are squared for simplicity
     public final int canvasSize = 600;
     public final int boardSize = 50;
+    private final BoardViewModel boardViewModel;
 
     private InfoBar infoBar;
 
@@ -32,14 +32,22 @@ public class MainView extends VBox {
 
     private Affine affine;
 
-    private Simulation simulation;
     private Board initialBoard;
 
     private CellState drawMode = CellState.ALIVE;
 
-    private int applicationState = EDITING;
+    private ApplicationViewModel appViewModel;
 
-    public MainView() {
+    private boolean isDrawingEnabled = true;
+
+    public MainView(ApplicationViewModel appViewModel, BoardViewModel boardViewModel, Board initialBoard) {
+        this.appViewModel = appViewModel;
+        this.boardViewModel = boardViewModel;
+        this.initialBoard = initialBoard;
+
+        this.appViewModel.listenToAppState(this::onApplicationStateChanged);
+        this.boardViewModel.listenToBoard(this::onBoardChanged);
+
         canvas = new Canvas(canvasSize, canvasSize);
         this.canvas.setOnMousePressed(this::handleDraw);
         this.canvas.setOnMouseDragged(this::handleDraw);
@@ -47,7 +55,7 @@ public class MainView extends VBox {
 
         this.setOnKeyPressed(this::onKeyPressed);
 
-        Toolbar toolbar = new Toolbar(this);
+        Toolbar toolbar = new Toolbar(this, appViewModel, boardViewModel);
 
         this.infoBar = new InfoBar();
         this.infoBar.setDrawMode(this.drawMode);
@@ -61,7 +69,22 @@ public class MainView extends VBox {
 
         this.affine = new Affine();
         this.affine.appendScale(canvasSize / boardSize, canvasSize / boardSize);
-        this.initialBoard = new BoundedBoard(boardSize, boardSize);
+
+    }
+
+    private void onBoardChanged(Board board) {
+        draw(board);
+    }
+
+    private void onApplicationStateChanged(ApplicationState state){
+        if(state == ApplicationState.EDITING) {
+            this.isDrawingEnabled = true;
+            this.boardViewModel.setBoard(this.initialBoard);
+        }else if(state == ApplicationState.SIMULATING){
+            this.isDrawingEnabled = false;
+        }else{
+            throw new IllegalArgumentException("Unsupported ApplicationState");
+        }
     }
 
     private void handleMoved(MouseEvent mouseEvent) {
@@ -79,13 +102,13 @@ public class MainView extends VBox {
     }
 
     private void handleDraw(MouseEvent event) {
-        if(applicationState == SIMULATING) return;
+        if(!isDrawingEnabled) return;
 
         Point2D simCoord = this.getSimulationCoordinates(event);
         int simX = (int) simCoord.getX();
         int simY = (int) simCoord.getY();
         this.initialBoard.setState(simX, simY, drawMode);
-        draw();
+        this.boardViewModel.setBoard(this.initialBoard);
     }
 
     private Point2D getSimulationCoordinates(MouseEvent event) {
@@ -93,31 +116,26 @@ public class MainView extends VBox {
         double mouseY = event.getY();
 
         try {
-            Point2D simCoord = this.affine.inverseTransform(mouseX, mouseY);
-            return simCoord;
+            return this.affine.inverseTransform(mouseX, mouseY);
         } catch (NonInvertibleTransformException e) {
             throw new RuntimeException("Non invertible transform");
         }
     }
 
-    public void draw() {
+    public void draw(Board board) {
         GraphicsContext g = this.canvas.getGraphicsContext2D();
         g.setTransform(affine);
         g.setFill(Color.LIGHTGRAY);
         g.fillRect(0, 0, canvasSize, canvasSize);
 
-        if(this.applicationState == EDITING){
-            drawSimulation(this.initialBoard);
-        }else{
-            drawSimulation(this.simulation.getBoard());
-        }
+        this.drawSimulation(board);
 
         g.setStroke(Color.GRAY);
         g.setLineWidth(0.05);
-        for (int x = 0; x <= this.initialBoard.getWidth(); x++) {
+        for (int x = 0; x <= board.getWidth(); x++) {
             g.strokeLine(x, 0, x, boardSize);
         }
-        for (int y = 0; y <= this.initialBoard.getHeight(); y++) {
+        for (int y = 0; y <= board.getHeight(); y++) {
             g.strokeLine(0, y, boardSize, y);
         }
     }
@@ -138,22 +156,5 @@ public class MainView extends VBox {
         this.infoBar.setDrawMode(mode);
     }
 
-    public void setApplicationState(int applicationState) {
-        if(applicationState == this.applicationState)  return;
-
-        if(applicationState == SIMULATING) {
-            this.simulation = new Simulation(this.initialBoard, new StandardRule());
-
-        }
-        this.applicationState = applicationState;
-    }
-
-    public int getApplicationState() {
-        return applicationState;
-    }
-
-    public Simulation getSimulation() {
-        return simulation;
-    }
 }
 

@@ -1,6 +1,10 @@
 package com.kelton.gol;
 
 import com.kelton.gol.model.CellState;
+import com.kelton.gol.model.StandardRule;
+import com.kelton.gol.viewmodel.ApplicationState;
+import com.kelton.gol.viewmodel.ApplicationViewModel;
+import com.kelton.gol.viewmodel.BoardViewModel;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
@@ -8,11 +12,15 @@ import javafx.scene.control.ToolBar;
 public class Toolbar extends ToolBar {
 
     private MainView view;
+    private ApplicationViewModel viewModel;
+    private BoardViewModel boardViewModel;
     private Simulator simulator;
 
-    public Toolbar(MainView view){
+    public Toolbar(MainView view, ApplicationViewModel viewModel, BoardViewModel boardViewModel) {
 
         this.view = view;
+        this.viewModel = viewModel;
+        this.boardViewModel = boardViewModel;
 
         Button draw = new Button("Draw");
         draw.setOnAction(this::handleDraw);
@@ -46,22 +54,19 @@ public class Toolbar extends ToolBar {
     }
 
     private void handleReset(ActionEvent actionEvent) {
-        this.view.setApplicationState(MainView.EDITING);
+        this.viewModel.setCurrentState(ApplicationState.EDITING);
         this.simulator = null;
-        this.view.draw();
     }
 
     private void handleStep(ActionEvent actionEvent) {
         switchToSimulatingState();
-        this.view.getSimulation().step();
-        this.view.draw();
+        this.simulator.doStep();
     }
 
-    private void switchToSimulatingState(){
-        if(this.view.getApplicationState() == MainView.EDITING){
-            this.view.setApplicationState(MainView.SIMULATING);
-            this.simulator = new Simulator(this.view, this.view.getSimulation());
-        }
+    private void switchToSimulatingState() {
+        this.viewModel.setCurrentState(ApplicationState.SIMULATING);
+        Simulation simulation = new Simulation(boardViewModel.getBoard(), new StandardRule());
+        this.simulator = new Simulator(this.boardViewModel, simulation);
     }
 
     private void handleErase(ActionEvent actionEvent) {

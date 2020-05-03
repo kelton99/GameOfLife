@@ -1,26 +1,26 @@
 package com.kelton.gol;
 
+import com.kelton.gol.viewmodel.BoardViewModel;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.util.Duration;
 
 public class Simulator {
 
     private Timeline timeline;
-    private MainView view;
+    private BoardViewModel boardViewModel;
     private Simulation simulation;
 
-    public Simulator(MainView view, Simulation simulation) {
-        this.view = view;
+    public Simulator(BoardViewModel boardViewModel, Simulation simulation) {
+        this.boardViewModel = boardViewModel;
         this.simulation = simulation;
-        this.timeline = new Timeline(new KeyFrame(Duration.millis(100), this::doStep));
+        this.timeline = new Timeline(new KeyFrame(Duration.millis(100), event -> this.doStep()));
         this.timeline.setCycleCount(Timeline.INDEFINITE);
     }
 
-    private void doStep(ActionEvent actionEvent) {
+    public void doStep() {
         this.simulation.step();
-        this.view.draw();
+        this.boardViewModel.setBoard(this.simulation.getBoard());
     }
 
     public void start() {

@@ -12,53 +12,142 @@ class StandardRuleTest {
 
     @BeforeEach
     void setUp() {
-        board = new BoundedBoard(3,3);
+        board = new BoundedBoard(3, 3);
         simulationRule = new StandardRule();
     }
 
     @Test
     void getNextState_zeroNeighborAlive() {
-        board.setState(1,1,CellState.ALIVE);
-        CellState nextState = simulationRule.getNextState(1,1, board);
+        board.setState(1, 1, CellState.ALIVE);
 
-        assertEquals(CellState.DEAD, board.getState(1,1));
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.DEAD, nextState);
     }
 
     @Test
     void getNextState_oneNeighborAlive() {
-        board.setState(1,1,CellState.ALIVE);
-        board.setState(1,2,CellState.ALIVE);
+        board.setState(1, 1, CellState.ALIVE);
 
-        CellState nextState = simulationRule.getNextState(1,1, board);
+        board.setState(1, 2, CellState.ALIVE);
 
-        assertEquals(CellState.DEAD, board.getState(1,1));
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.DEAD, nextState);
     }
+
     @Test
     void getNextState_twoNeighborAlive() {
-        board.setState(1,1,CellState.ALIVE);
-        board.setState(1,2,CellState.ALIVE);
+        board.setState(1, 1, CellState.ALIVE);
 
-        CellState nextState = simulationRule.getNextState(1,1, board);
+        board.setState(1, 2, CellState.ALIVE);
+        board.setState(2, 2, CellState.ALIVE);
 
-        assertEquals(CellState.DEAD, board.getState(1,1));
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.ALIVE, nextState);
     }
+
     @Test
     void getNextState_threeNeighborAlive() {
-        board.setState(1,1,CellState.ALIVE);
-        board.setState(1,2,CellState.ALIVE);
+        board.setState(1, 1, CellState.ALIVE);
 
-        CellState nextState = simulationRule.getNextState(1,1, board);
+        board.setState(1, 2, CellState.ALIVE);
+        board.setState(0, 1, CellState.ALIVE);
+        board.setState(2, 2, CellState.ALIVE);
 
-        assertEquals(CellState.DEAD, board.getState(1,1));
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.ALIVE, nextState);
     }
+
     @Test
     void getNextState_fourNeighborAlive() {
-        board.setState(1,1,CellState.ALIVE);
-        board.setState(1,2,CellState.ALIVE);
+        board.setState(1, 1, CellState.ALIVE);
 
-        CellState nextState = simulationRule.getNextState(1,1, board);
+        board.setState(1, 2, CellState.ALIVE);
+        board.setState(0, 2, CellState.ALIVE);
+        board.setState(0, 1, CellState.ALIVE);
+        board.setState(2, 2, CellState.ALIVE);
 
-        assertEquals(CellState.DEAD, board.getState(1,1));
+
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.DEAD, nextState);
+    }
+
+    @Test
+    void getNextState_eightNeighborAlive() {
+
+        for (int y = 0; y < board.getHeight(); y++) {
+            for (int x = 0; x < board.getWidth(); x++) {
+                board.setState(x, y, CellState.ALIVE);
+            }
+        }
+
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.DEAD, nextState);
+
+    }
+
+    @Test
+    void getNextState_dead_noNeighbours() {
+        board.setState(1, 1, CellState.DEAD);
+
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.DEAD, nextState);
+    }
+
+    @Test
+    void getNextState_dead_twoNeighbours() {
+        board.setState(1, 1, CellState.DEAD);
+        board.setState(2, 2, CellState.ALIVE);
+        board.setState(1, 2, CellState.ALIVE);
+
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.DEAD, nextState);
+    }
+
+    @Test
+    void getNextState_dead_threeNeighbours() {
+        board.setState(1, 1, CellState.DEAD);
+        board.setState(2, 2, CellState.ALIVE);
+        board.setState(1, 2, CellState.ALIVE);
+        board.setState(0, 1, CellState.ALIVE);
+
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.ALIVE, nextState);
+    }
+
+    @Test
+    void getNextState_dead_fourNeighbours() {
+        board.setState(1, 1, CellState.DEAD);
+        board.setState(2, 2, CellState.ALIVE);
+        board.setState(1, 2, CellState.ALIVE);
+        board.setState(0, 1, CellState.ALIVE);
+        board.setState(0, 2, CellState.ALIVE);
+
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.DEAD, nextState);
+    }
+
+    @Test
+    void getNextState_dead_eightNeighbours() {
+        for (int y = 0; y < board.getHeight(); y++) {
+            for (int x = 0; x < board.getWidth(); x++) {
+                board.setState(x, y, CellState.ALIVE);
+            }
+        }
+        board.setState(1, 1, CellState.DEAD);
+
+        CellState nextState = simulationRule.getNextState(1, 1, board);
+
+        assertEquals(CellState.DEAD, nextState);
     }
 
 }
