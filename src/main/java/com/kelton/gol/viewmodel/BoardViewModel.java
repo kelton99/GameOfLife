@@ -13,6 +13,7 @@ public class BoardViewModel {
     public BoardViewModel() {
         boardListeners = new LinkedList<>();
     }
+
     public void listenToBoard(SimpleChangeListener<Board> listener){
         boardListeners.add(listener);
     }
