@@ -6,7 +6,7 @@ import com.kelton.gol.model.SimulationRule;
 
 public class Simulation {
 
-    private SimulationRule simulationRule;
+    private final SimulationRule simulationRule;
     private Board simulationBoard;
 
     public Simulation(Board simulationBoard, SimulationRule simulationRule) {
