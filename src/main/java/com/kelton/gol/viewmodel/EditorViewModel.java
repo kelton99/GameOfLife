@@ -7,7 +7,7 @@ import com.kelton.gol.util.Property;
 
 public class EditorViewModel {
 
-    private Property<CellState> drawMode = new Property<>(CellState.ALIVE);
+    private final Property<CellState> drawMode = new Property<>(CellState.ALIVE);
 
     private final BoardViewModel boardViewModel;
     private final Board editorBoard;

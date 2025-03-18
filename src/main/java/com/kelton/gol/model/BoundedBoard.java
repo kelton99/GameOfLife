@@ -16,9 +16,11 @@ public class BoundedBoard implements Board {
         this.height = height;
         this.board = new CellState[width][height];
 
-        for (int y = 0; y < this.height; y++)
-            for (int x = 0; x < this.width; x++)
-                this.setState(x,y, DEAD);
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; x < this.width; x++) {
+                this.setState(x, y, DEAD);
+            }
+        }
     }
 
 

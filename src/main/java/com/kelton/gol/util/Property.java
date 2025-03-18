@@ -1,6 +1,5 @@
 package com.kelton.gol.util;
 
-import com.kelton.gol.viewmodel.ApplicationState;
 import com.kelton.gol.viewmodel.SimpleChangeListener;
 
 import java.util.LinkedList;

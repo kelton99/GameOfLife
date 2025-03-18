@@ -28,12 +28,7 @@ public class InfoBar extends HBox {
     }
 
     private void setDrawMode(CellState drawMode){
-        String drawModeString;
-        if(drawMode == CellState.ALIVE)
-            drawModeString = "Drawing";
-        else
-            drawModeString = "Erasing";
-
+        String drawModeString = (drawMode == CellState.ALIVE) ? "Drawing" : "Erasing";
         String drawModeFormat = "Draw Mode: %s";
         this.editingTool.setText(String.format(drawModeFormat, drawModeString));
     }

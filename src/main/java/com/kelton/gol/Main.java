@@ -16,7 +16,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         ApplicationViewModel appViewModel = new ApplicationViewModel();
         BoardViewModel boardViewModel = new BoardViewModel();
-        Board board = new BoundedBoard(20, 20);
+        Board board = new BoundedBoard(50, 50);
         EditorViewModel editorViewModel = new EditorViewModel(boardViewModel, board);
         SimulationViewModel simulationViewModel = new SimulationViewModel(boardViewModel);
 
@@ -34,7 +34,7 @@ public class Main extends Application {
         view.setTop(toolbar);
         view.setCenter(simulationCanvas);
         view.setBottom(infoBar);
-        stage.setScene(new Scene(view, 1200, 800));
+        stage.setScene(new Scene(view, 850, 900));
         stage.show();
     }
 

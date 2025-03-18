@@ -15,14 +15,14 @@ import javafx.scene.transform.NonInvertibleTransformException;
 
 public class SimulationCanvas extends Pane {
 
-    public final int canvasSize = 600;
+    public final int canvasSize = 800;
 
-    private Canvas canvas;
+    private final Canvas canvas;
 
     private final Affine affine;
 
-    private EditorViewModel editorViewModel;
-    private BoardViewModel boardViewModel;
+    private final EditorViewModel editorViewModel;
+    private final BoardViewModel boardViewModel;
 
     public SimulationCanvas(EditorViewModel editorViewModel, BoardViewModel boardViewModel) {
         this.editorViewModel = editorViewModel;
